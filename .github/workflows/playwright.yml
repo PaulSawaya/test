@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: lts/*
 
-      # ✅ Cache node_modules to speed up npm install
+      # ✅ Cache npm dependencies
       - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
@@ -30,20 +30,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ✅ Cache Playwright browsers so they don’t download each time
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
+      # ✅ Try to restore Playwright browsers cache
+      - name: Restore Playwright browsers cache
         id: playwright-cache
+        uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-browsers
 
-      # ✅ Only install browsers if cache is empty
+      # ✅ Install browsers only if not cached
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      # Start your local server in background
+      # ✅ Save cache after install (important!)
+      - name: Save Playwright browsers cache
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers
+
+      # ✅ Start your local server
       - name: Start server
         run: npm start &
         env:
