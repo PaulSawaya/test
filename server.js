@@ -31,7 +31,7 @@ app.get("/hello", (req,res) => {
 
 app.get("/users", (req,res) => {
     let names = ""
-
+ 
     for (let person of database){
         names = names + person.first_name + "\n"
     }
@@ -63,11 +63,31 @@ app.post("/users", (req, res) => {
     return res.status(400).send("Missing fields")
   }
 
-  database.push({ first_name, last_name, age })
-  res.send("User added successfully")
+//   2️⃣ Check duplicates (case-insensitive, matches both first & last name)
+  const exists = database.some(
+    p =>
+      p.first_name.toLowerCase() === first_name.toLowerCase()
+  )
+
+  console.log(exists)
+  if (exists) {
+    return res.status(400).send("Person already exists")
+  }
+
+  database.push({ first_name, last_name, age }) 
+  return res.status(200).send("User added successfully") 
 })
 
 
+
+app.post("/reset", (req, res) => {
+  database = [
+    { first_name: "Paul", last_name: "Sawaya", age: 21 },
+    { first_name: "Elie", last_name: "Sawma", age: 29 },
+    { first_name: "Charbel", last_name: "Khoury", age: 70 }
+  ]
+  res.send("Database reset")
+})
 
 app.listen(3000)
 
