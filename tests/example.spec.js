@@ -64,7 +64,7 @@ test.describe('API Tests', () => {
 
     const res = await api.post(`${BASE_URL}/users`, { data: newUser })
     expect(res.status()).toBe(200)
-    expect(await res.text()).toBe('User added successfully')
+    expect(await res.text()).toBe('User added successfullyy')
 
     // Verify it's added
     const check = await api.get(`${BASE_URL}/users/Maria`)
